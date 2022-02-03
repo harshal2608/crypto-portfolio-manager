@@ -1,11 +1,11 @@
 import Portfolio from "./components/portfolio";
-// import axios from "axios";
+import axios from "axios";
 import { useEffect, useContext } from "react";
 import { GlobalContext } from "./context/globalContext";
 import { Container } from "@mui/material";
 import BasicTable from "./components/Table";
 import styled from "@emotion/styled";
-import axios from "./axios";
+// import axios from "./axios";
 import { Stack } from "@mui/material";
 import { Divider } from "@mui/material";
 
@@ -21,7 +21,7 @@ function App() {
   const ctx = useContext(GlobalContext);
   async function fetchdata() {
     const jsonResponse = await axios.get(
-      "/v1/cryptocurrency/listings/latest?sort=market_cap&limit=100&convert=INR"
+      "https://cors-for-portfolio.herokuapp.com/"
     );
 
     const response = jsonResponse.data.data;
