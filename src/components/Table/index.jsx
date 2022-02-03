@@ -1,88 +1,90 @@
 import React from "react";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
+import TableCell, { tableCellClasses } from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import { useState, useEffect } from "react";
-import axios from "axios";
+import { useState, useEffect, useContext } from "react";
+
+import { GlobalContext } from "../../context/globalContext";
+
+import styled from "@emotion/styled";
+import formatNumber from "../../utils/formatNumber";
+
+const StyledTableRow = styled(TableRow)``;
+
+const StyledTableCell = styled(TableCell)(() => ({
+  [`&.${tableCellClasses.head}`]: {
+    fontWeight: "600",
+    fontSize: "1rem",
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: "1rem",
+    fontWeight: "600",
+  },
+}));
+
+const Span = styled.span`
+  font-weight: normal;
+`;
 
 function createData(name, symbol, price, rank, supply, holdings) {
   return { name, symbol, price, rank, supply, holdings };
 }
 
-export default function BasicTable({ tabledata, name }) {
-  const [data, setData] = useState([]);
+export default function BasicTable({ data }) {
+  const ctx = useContext(GlobalContext);
   const [rows, setRows] = useState([]);
-
-  async function fetchdata() {
-    const jsonResponse = await axios.get(
-      "https://api.jsonbin.io/v3/b/61fa41844ce71361b8cb411e",
-      {
-        headers: {
-          "X-Master-Key":
-            "$2b$10$lwGmkpzcXicy8Mp5Xxckye2gn6lQeIAQnOYmkwf4AAR.DXKmerdcu",
-        },
-      }
-    );
-    console.log(jsonResponse.data.record.data[0]);
-    const response = jsonResponse.data.record.data;
-    setData(response);
-    console.log(response);
-  }
-
-  useEffect(() => {
-    try {
-      fetchdata();
-    } catch (e) {
-      console.log(e);
-    }
-  }, []);
 
   useEffect(() => {
     const newRows = data.map((i) =>
       createData(
         i.name,
         i.symbol,
-        i.quote.USD.price,
+        formatNumber(i.quote.INR.price),
         i.cmc_rank,
-        i.circulating_supply,
-        10
+        formatNumber(i.circulating_supply),
+        i.holdings ? i.holdings : 0
       )
     );
     setRows(newRows);
-    console.log(rows);
   }, [data]);
 
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
         <TableHead>
-          <TableRow>
-            <TableCell>Name</TableCell>
-            <TableCell align="right">Price</TableCell>
-            <TableCell align="right">rank</TableCell>
-            <TableCell align="right">supply</TableCell>
-            <TableCell align="right">holdings</TableCell>
-          </TableRow>
+          <StyledTableRow>
+            <StyledTableCell>#</StyledTableCell>
+            <StyledTableCell>Name</StyledTableCell>
+            <StyledTableCell align="right">Price</StyledTableCell>
+            <StyledTableCell align="right">Circulating Supply</StyledTableCell>
+            <StyledTableCell align="right">Holdings</StyledTableCell>
+          </StyledTableRow>
         </TableHead>
         <TableBody>
           {rows
             ? rows.map((row) => (
-                <TableRow
+                <StyledTableRow
                   key={row.name}
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                 >
-                  <TableCell component="th" scope="row">
-                    {row.name} {row.symbol}
-                  </TableCell>
-                  <TableCell align="right">{row.price}</TableCell>
-                  <TableCell align="right">{row.rank}</TableCell>
-                  <TableCell align="right">{row.supply}</TableCell>
-                  <TableCell align="right">{row.holdings}</TableCell>
-                </TableRow>
+                  <TableCell>{row.rank}</TableCell>
+                  <StyledTableCell component="th" scope="row">
+                    {row.name} <Span>{row.symbol}</Span>
+                  </StyledTableCell>
+                  <StyledTableCell align="right">
+                    &#8377; {row.price}
+                  </StyledTableCell>
+                  <StyledTableCell align="right">
+                    {row.supply} {row.symbol}
+                  </StyledTableCell>
+                  <StyledTableCell align="right">
+                    {row.holdings}
+                  </StyledTableCell>
+                </StyledTableRow>
               ))
             : null}
         </TableBody>

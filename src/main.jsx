@@ -4,12 +4,15 @@ import "./index.css";
 import App from "./App";
 import CssBaseline from "@mui/material/CssBaseline";
 import GlobalThemeProvider from "./theme/index";
+import GlobalProvider from "./context/globalContext";
 
 ReactDOM.render(
   <React.StrictMode>
     <GlobalThemeProvider>
-      <CssBaseline />
-      <App />
+      <GlobalProvider>
+        <CssBaseline />
+        <App />
+      </GlobalProvider>
     </GlobalThemeProvider>
   </React.StrictMode>,
   document.getElementById("root")
