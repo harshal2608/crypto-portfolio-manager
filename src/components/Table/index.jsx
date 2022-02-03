@@ -1,16 +1,18 @@
 import React from "react";
+import { useState, useEffect } from "react";
+
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell, { tableCellClasses } from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
-import { useState, useEffect, useContext } from "react";
-
-import { GlobalContext } from "../../context/globalContext";
-
+import TablePagination from "@mui/material/TablePagination";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
 import styled from "@emotion/styled";
+
+import { ImageWrapper, Image, Span, Row } from "../../theme/components";
 import formatNumber from "../../utils/formatNumber";
 
 const StyledTableRow = styled(TableRow)``;
@@ -23,24 +25,32 @@ const StyledTableCell = styled(TableCell)(() => ({
   [`&.${tableCellClasses.body}`]: {
     fontSize: "1rem",
     fontWeight: "600",
+    alignItems: "center",
   },
 }));
 
-const Span = styled.span`
-  font-weight: normal;
-`;
-
-function createData(name, symbol, price, rank, supply, holdings) {
-  return { name, symbol, price, rank, supply, holdings };
+function createData(id, name, symbol, price, rank, supply, holdings) {
+  return { id, name, symbol, price, rank, supply, holdings };
 }
 
 export default function BasicTable({ data }) {
-  const ctx = useContext(GlobalContext);
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [rows, setRows] = useState([]);
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(+event.target.value);
+    setPage(0);
+  };
 
   useEffect(() => {
     const newRows = data.map((i) =>
       createData(
+        i.id,
         i.name,
         i.symbol,
         formatNumber(i.quote.INR.price),
@@ -53,42 +63,72 @@ export default function BasicTable({ data }) {
   }, [data]);
 
   return (
-    <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 650 }} aria-label="simple table">
-        <TableHead>
-          <StyledTableRow>
-            <StyledTableCell>#</StyledTableCell>
-            <StyledTableCell>Name</StyledTableCell>
-            <StyledTableCell align="right">Price</StyledTableCell>
-            <StyledTableCell align="right">Circulating Supply</StyledTableCell>
-            <StyledTableCell align="right">Holdings</StyledTableCell>
-          </StyledTableRow>
-        </TableHead>
-        <TableBody>
-          {rows
-            ? rows.map((row) => (
-                <StyledTableRow
-                  key={row.name}
-                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                >
-                  <TableCell>{row.rank}</TableCell>
-                  <StyledTableCell component="th" scope="row">
-                    {row.name} <Span>{row.symbol}</Span>
-                  </StyledTableCell>
-                  <StyledTableCell align="right">
-                    &#8377; {row.price}
-                  </StyledTableCell>
-                  <StyledTableCell align="right">
-                    {row.supply} {row.symbol}
-                  </StyledTableCell>
-                  <StyledTableCell align="right">
-                    {row.holdings}
-                  </StyledTableCell>
-                </StyledTableRow>
-              ))
-            : null}
-        </TableBody>
-      </Table>
-    </TableContainer>
+    <Card>
+      <CardContent>
+        <TablePagination
+          rowsPerPageOptions={[10, 25, 100]}
+          component="div"
+          count={rows.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
+        <TableContainer>
+          <Table stickyHeader aria-label="simple table">
+            <TableHead>
+              <StyledTableRow>
+                <StyledTableCell>#</StyledTableCell>
+                <StyledTableCell>Name</StyledTableCell>
+                <StyledTableCell align="right">Price</StyledTableCell>
+                <StyledTableCell align="right">
+                  Circulating Supply
+                </StyledTableCell>
+                <StyledTableCell align="right">Holdings</StyledTableCell>
+              </StyledTableRow>
+            </TableHead>
+            <TableBody>
+              {rows
+                ? rows
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    .map((row) => (
+                      <StyledTableRow key={row.name}>
+                        <TableCell>{row.rank}</TableCell>
+                        <StyledTableCell>
+                          <Row>
+                            <ImageWrapper>
+                              <Image
+                                src={`https://s2.coinmarketcap.com/static/img/coins/64x64/${row.id}.png`}
+                              />
+                            </ImageWrapper>
+                            {row.name} <Span>{row.symbol}</Span>
+                          </Row>
+                        </StyledTableCell>
+                        <StyledTableCell align="right">
+                          &#8377; {row.price}
+                        </StyledTableCell>
+                        <StyledTableCell align="right">
+                          {row.supply} {row.symbol}
+                        </StyledTableCell>
+                        <StyledTableCell align="right">
+                          {row.holdings}
+                        </StyledTableCell>
+                      </StyledTableRow>
+                    ))
+                : null}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <TablePagination
+          rowsPerPageOptions={[10, 25, 100]}
+          component="div"
+          count={rows.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
+      </CardContent>
+    </Card>
   );
 }

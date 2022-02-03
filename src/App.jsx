@@ -1,4 +1,4 @@
-import Portfolio from "./pages/portfolio";
+import Portfolio from "./components/portfolio";
 // import axios from "axios";
 import { useEffect, useContext } from "react";
 import { GlobalContext } from "./context/globalContext";
@@ -10,22 +10,17 @@ import { Stack } from "@mui/material";
 import { Divider } from "@mui/material";
 
 const StyledContainer = styled(Container)`
-  margin-top: 20px;
+  padding: 40px;
+
+  @media only screen and (max-width: 600px) {
+    padding: 20px 0;
+  }
 `;
 
 function App() {
   const ctx = useContext(GlobalContext);
   async function fetchdata() {
-    const jsonResponse = await axios.get(
-      import.meta.env.VITE_FETCH_URL
-      // "https://api.jsonbin.io/v3/b/61fa616ef77b236211e8fe28",
-      // {
-      //   headers: {
-      //     "X-Master-Key":
-      //       "$2b$10$lwGmkpzcXicy8Mp5Xxckye2gn6lQeIAQnOYmkwf4AAR.DXKmerdcu",
-      //   },
-      // }
-    );
+    const jsonResponse = await axios.get(import.meta.env.VITE_FETCH_URL);
 
     const response = jsonResponse.data.data;
     console.log(response);
