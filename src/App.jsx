@@ -20,7 +20,9 @@ const StyledContainer = styled(Container)`
 function App() {
   const ctx = useContext(GlobalContext);
   async function fetchdata() {
-    const jsonResponse = await axios.get(import.meta.env.VITE_FETCH_URL);
+    const jsonResponse = await axios.get(
+      "/v1/cryptocurrency/listings/latest?sort=market_cap&limit=100&convert=INR"
+    );
 
     const response = jsonResponse.data.data;
     console.log(response);
