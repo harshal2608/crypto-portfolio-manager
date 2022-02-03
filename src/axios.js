@@ -1,6 +1,6 @@
 import axios from "axios";
 const instance = axios.create({
-  baseURL: import.meta.env.VITE_baseURL,
+  baseURL: "https://pro-api.coinmarketcap.com",
   headers: {
     "X-CMC_PRO_API_KEY": import.meta.env.VITE_API_KEY,
     Accept: "application/json",
