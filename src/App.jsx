@@ -21,10 +21,16 @@ function App() {
   const ctx = useContext(GlobalContext);
   async function fetchdata() {
     const jsonResponse = await axios.get(
-      "https://cors-for-portfolio.herokuapp.com/"
+      "https://api.jsonbin.io/v3/b/61fbe0394ce71361b8ccae79",
+      {
+        headers: {
+          "X-Master-Key":
+            "$2b$10$lwGmkpzcXicy8Mp5Xxckye2gn6lQeIAQnOYmkwf4AAR.DXKmerdcu",
+        },
+      }
     );
 
-    const response = jsonResponse.data.data;
+    const response = jsonResponse.data.record.data;
     console.log(response);
     const updatedResponse = response.map((element) => {
       return { ...element, holdings: 0 };
